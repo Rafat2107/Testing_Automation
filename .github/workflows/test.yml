@@ -1,0 +1,41 @@
+name: Automation Test Execution
+
+on:
+  push:
+    branches:
+      - main
+      - Testing_Automation
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Maven
+        run: mvn -version
+
+      - name: Install dependencies
+        run: mvn clean install -DskipTests
+
+      - name: Run Automation Tests
+        run: mvn test
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test-Reports
+          path: target/surefire-reports
